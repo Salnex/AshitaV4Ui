@@ -22,7 +22,7 @@ AshitaV4Ui
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone https://git.salsinc.net/salnex/AshitaV4Ui/src/branch/main
    ```
 2. Navigate to the project directory:
    ```
