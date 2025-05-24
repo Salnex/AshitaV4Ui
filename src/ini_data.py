@@ -573,6 +573,46 @@ tooltips = {
         ),
     },
 }
+
+padmode000_options = [
+    ("Enable Gamepad", "Enables or disables the gamepad functionality."),
+    ("Enable Force Feedback", "Enables or disables the gamepad force feedback (rumble) features."),
+    ("Enable Sliders", "Enables or disables the gamepad slider controls."),
+    ("Enable Hat Switches", "Enables or disables the gamepad hat switch controls."),
+    ("Enable When Inactive", "Enables or disables the gamepad working if the game window is not focused."),
+    ("Enable XInput", "Enables or disables if the gamepad should be detected as XInput or not."),
+]
+
+padsin000_options = [
+    ("Toggle auto-run.", "Button for toggling auto-run."),
+    ("Toggle CTRL macro bar display.", "Button for toggling CTRL macro bar display."),
+    ("Toggle first/third person view.", "Button for toggling first/third person view."),
+    ("Toggle ALT macro bar display.", "Button for toggling ALT macro bar display."),
+    ("Toggle /heal, lock target.", "Button for /heal or lock target."),
+    ("Cancel.", "Button for cancel."),
+    ("Main menu.", "Button for main menu."),
+    ("Select, Confirm selection.", "Button for select/confirm."),
+    ("Select active window.", "Button for selecting active window."),
+    ("Toggle menu/window visibility.", "Button for toggling menu/window visibility."),
+    ("Menu navigation with movement thumbstick while held.", "Button for menu navigation with thumbstick."),
+    ("Move camera with movement thumbstick while held.", "Button for moving camera with thumbstick."),
+    ("Toggle logout window.", "Button for toggling logout window."),
+    ("Player movement. (up)", "Button for player movement up."),
+    ("Player movement. (down)", "Button for player movement down."),
+    ("Player movement. (left)", "Button for player movement left."),
+    ("Player movement. (right)", "Button for player movement right."),
+    ("Camera movement. (up)", "Button for camera movement up."),
+    ("Camera movement. (down)", "Button for camera movement down."),
+    ("Camera movement. (left)", "Button for camera movement left."),
+    ("Camera movement. (right)", "Button for camera movement right."),
+    ("Menu movement. (up)", "Button for menu movement up (also targeting)."),
+    ("Menu movement. (down)", "Button for menu movement down (also targeting)."),
+    ("Menu movement. (left)", "Button for menu movement left (also targeting)."),
+    ("Menu movement. (right)", "Button for menu movement right (also targeting)."),
+    ("Take screenshot. (Menu/windows must be hidden.)", "Button for taking screenshot."),
+    ("Toggle use of movement, menu and camera controls.", "Button for toggling use of movement/menu/camera controls."),
+]
+
 friendly_names = {
     "ashita.launcher": {
         "autoclose": "Auto Close Launcher",

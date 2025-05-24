@@ -8,7 +8,7 @@ import os
 import shutil
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
-from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys
+from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys, padmode000_options, padsin000_options
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
@@ -90,6 +90,12 @@ class NewIniDialog(QtWidgets.QDialog):
 
         # Tabs for each section, each with a scroll area
         self.tabs = QtWidgets.QTabWidget()
+
+        # Prepare a special tab for gamepad options
+        gamepad_tab = QtWidgets.QWidget()
+        gamepad_layout = QtWidgets.QFormLayout(gamepad_tab)
+        gamepad_inputs = {}
+
         for section, keys in self.ini_structure.items():
             scroll = QtWidgets.QScrollArea()
             scroll.setWidgetResizable(True)
@@ -104,6 +110,62 @@ class NewIniDialog(QtWidgets.QDialog):
                 tooltip = self.tooltips.get(section, {}).get(key, "")
                 # Use dropdown if valid values exist
                 valid = valid_values.get(section, {}).get(key)
+
+                # Move gamepad options to the special tab
+                if section == "ffxi.registry" and key == "padmode000":
+                    groupbox = QtWidgets.QGroupBox(label_text)
+                    vbox = QtWidgets.QVBoxLayout(groupbox)
+                    checkboxes = []
+                    # Default is a comma-separated string, e.g. "1,0,1,0,1,1"
+                    default_values = [x.strip() for x in default.split(",")] if default else ["0"] * 6
+                    for i, (opt_label, opt_tip) in enumerate(padmode000_options):
+                        cb = QtWidgets.QCheckBox(opt_label)
+                        cb.setToolTip(opt_tip)
+                        if i < len(default_values) and default_values[i] == "1":
+                            cb.setChecked(True)
+                        vbox.addWidget(cb)
+                        checkboxes.append(cb)
+                    groupbox.setToolTip(tooltip)
+                    gamepad_inputs[key] = checkboxes
+                    gamepad_layout.addRow(groupbox)
+                    continue
+                elif section == "ffxi.registry" and key == "padsin000":
+                    groupbox = QtWidgets.QGroupBox(label_text)
+                    vbox = QtWidgets.QVBoxLayout(groupbox)
+                    spinboxes = []
+                    # Default is a comma-separated string, e.g. "0,1,2,..."
+                    default_values = [x.strip() for x in default.split(",")] if default else ["0"] * 27
+                    for i, (desc, tip) in enumerate(padsin000_options):
+                        hbox = QtWidgets.QHBoxLayout()
+                        label = QtWidgets.QLabel(f"{i}: {desc}")
+                        label.setToolTip(tip)
+                        spin = QtWidgets.QSpinBox()
+                        spin.setMinimum(0)
+                        spin.setMaximum(255)
+                        spin.setToolTip(tip)
+                        if i < len(default_values):
+                            try:
+                                spin.setValue(int(default_values[i]))
+                            except ValueError:
+                                spin.setValue(0)
+                        hbox.addWidget(label)
+                        hbox.addWidget(spin)
+                        vbox.addLayout(hbox)
+                        spinboxes.append(spin)
+                    groupbox.setToolTip(tooltip)
+                    gamepad_inputs[key] = spinboxes
+                    gamepad_layout.addRow(groupbox)
+                    continue
+                elif section == "ffxi.registry" and key == "padguid000":
+                    edit = QtWidgets.QLineEdit(default)
+                    edit.setToolTip(tooltip)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    gamepad_inputs[key] = edit
+                    gamepad_layout.addRow(label, edit)
+                    continue
+
+                # All other keys as before
                 if valid:
                     combo = QtWidgets.QComboBox()
                     combo.setToolTip(tooltip)
@@ -134,6 +196,10 @@ class NewIniDialog(QtWidgets.QDialog):
                     tab_layout.addRow(label, edit)
             scroll.setWidget(tab_content)
             self.tabs.addTab(scroll, section)
+
+        # Add the gamepad tab last
+        self.inputs["gamepad"] = gamepad_inputs
+        self.tabs.addTab(gamepad_tab, "Gamepad")
         layout.addWidget(self.tabs)
 
         # Save/Cancel buttons
@@ -164,8 +230,10 @@ class NewIniDialog(QtWidgets.QDialog):
         config = configparser.ConfigParser()
         for section, keys in self.ini_structure.items():
             config[section] = {}
-            # Write visible keys from UI
+            # Write visible keys from UI (excluding gamepad keys)
             for key, widget in self.inputs.get(section, {}).items():
+                if key in ("padmode000", "padsin000", "padguid000") and section == "ffxi.registry":
+                    continue  # These are handled in the gamepad tab
                 if isinstance(widget, QtWidgets.QCheckBox):
                     config[section][key] = "1" if widget.isChecked() else "0"
                 elif isinstance(widget, QtWidgets.QComboBox):
@@ -176,6 +244,37 @@ class NewIniDialog(QtWidgets.QDialog):
             for key, default in keys.items():
                 if key in hidden_keys.get(section, set()):
                     config[section][key] = default
+
+        # Write gamepad tab values into ffxi.registry
+        gamepad_inputs = self.inputs.get("gamepad", {})
+        if "ffxi.registry" not in config:
+            config["ffxi.registry"] = {}
+
+        # padmode000: checkboxes
+        padmode = gamepad_inputs.get("padmode000")
+        if padmode:
+            values = ["1" if cb.isChecked() else "0" for cb in padmode]
+            # If all are "0" (unchecked), treat as default and write "-1"
+            if all(v == "0" for v in values):
+                config["ffxi.registry"]["padmode000"] = "-1"
+            else:
+                config["ffxi.registry"]["padmode000"] = ",".join(values)
+
+        # padsin000: spinboxes
+        padsin = gamepad_inputs.get("padsin000")
+        if padsin:
+            values = [str(spin.value()) for spin in padsin]
+            # If all are "0", treat as default and write "-1"
+            if all(v == "0" for v in values):
+                config["ffxi.registry"]["padsin000"] = "-1"
+            else:
+                config["ffxi.registry"]["padsin000"] = ",".join(values)
+
+        # padguid000: line edit
+        padguid = gamepad_inputs.get("padguid000")
+        if padguid:
+            config["ffxi.registry"]["padguid000"] = padguid.text()
+
         try:
             with open(ini_path, "w") as f:
                 config.write(f)
