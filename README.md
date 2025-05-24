@@ -28,16 +28,12 @@ AshitaV4Ui
    ```
    cd AshitaV4Ui
    ```
-3. Install the required dependencies (if any).
+3. Install the required dependencies:
+   qtpy
+   PyQt6
+   requests
 
 ## Usage
 
 To run the application, execute the `Main.py` file. The application will provide a graphical interface for managing INI files.
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a pull request or open an issue for any suggestions or improvements.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for more details.
