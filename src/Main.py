@@ -250,6 +250,7 @@ class NewIniDialog(QtWidgets.QDialog):
         if "ffxi.registry" not in config:
             config["ffxi.registry"] = {}
 
+
         # padmode000: checkboxes
         padmode = gamepad_inputs.get("padmode000")
         if padmode:
