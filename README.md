@@ -29,8 +29,8 @@ AshitaV4Ui
    cd AshitaV4Ui
    ```
 3. Install the required dependencies:
-   qtpy
-   PyQt6
+   qtpy  
+   PyQt6  
    requests
 
 ## Usage
