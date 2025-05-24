@@ -8,7 +8,7 @@ import os
 import shutil
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
-from ini_data import ini_structure, tooltips, friendly_names  # Add friendly_names to import
+from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
@@ -97,15 +97,41 @@ class NewIniDialog(QtWidgets.QDialog):
             tab_layout = QtWidgets.QFormLayout(tab_content)
             self.inputs[section] = {}
             for key, default in keys.items():
-                # Use friendly name if available, else fallback to key
+                # Skip hidden keys
+                if key in hidden_keys.get(section, set()):
+                    continue
                 label_text = friendly_names.get(section, {}).get(key, key)
-                label = QtWidgets.QLabel(label_text)
-                edit = QtWidgets.QLineEdit(default)
                 tooltip = self.tooltips.get(section, {}).get(key, "")
-                label.setToolTip(tooltip)
-                edit.setToolTip(tooltip)
-                self.inputs[section][key] = edit
-                tab_layout.addRow(label, edit)
+                # Use dropdown if valid values exist
+                valid = valid_values.get(section, {}).get(key)
+                if valid:
+                    combo = QtWidgets.QComboBox()
+                    combo.setToolTip(tooltip)
+                    # Add items as (label, value)
+                    for label, value in valid.items():
+                        combo.addItem(label, value)
+                        # Set default if matches
+                        if str(default) == str(value):
+                            combo.setCurrentText(label)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    self.inputs[section][key] = combo
+                    tab_layout.addRow(label, combo)
+                elif "boolean" in tooltip.lower():
+                    checkbox = QtWidgets.QCheckBox()
+                    checkbox.setChecked(str(default).lower() in ("1", "true", "yes", "on"))
+                    checkbox.setToolTip(tooltip)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    self.inputs[section][key] = checkbox
+                    tab_layout.addRow(label, checkbox)
+                else:
+                    edit = QtWidgets.QLineEdit(default)
+                    edit.setToolTip(tooltip)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    self.inputs[section][key] = edit
+                    tab_layout.addRow(label, edit)
             scroll.setWidget(tab_content)
             self.tabs.addTab(scroll, section)
         layout.addWidget(self.tabs)
@@ -136,10 +162,20 @@ class NewIniDialog(QtWidgets.QDialog):
             return
 
         config = configparser.ConfigParser()
-        for section, keys in self.inputs.items():
+        for section, keys in self.ini_structure.items():
             config[section] = {}
-            for key, edit in keys.items():
-                config[section][key] = edit.text()
+            # Write visible keys from UI
+            for key, widget in self.inputs.get(section, {}).items():
+                if isinstance(widget, QtWidgets.QCheckBox):
+                    config[section][key] = "1" if widget.isChecked() else "0"
+                elif isinstance(widget, QtWidgets.QComboBox):
+                    config[section][key] = widget.currentData()
+                else:
+                    config[section][key] = widget.text()
+            # Write hidden keys with their default values
+            for key, default in keys.items():
+                if key in hidden_keys.get(section, set()):
+                    config[section][key] = default
         try:
             with open(ini_path, "w") as f:
                 config.write(f)

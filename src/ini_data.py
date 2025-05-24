@@ -1,3 +1,4 @@
+import re
 ini_structure = {
     "ashita.launcher": {
         "autoclose": "1",
@@ -694,3 +695,31 @@ friendly_names = {
         "padguid000": "Gamepad GUID",
     },
 }
+
+hidden_keys = {}
+
+for section, keys in tooltips.items():
+    for key, tip in keys.items():
+        if "Unknown / unused." in tip:
+            if section not in hidden_keys:
+                hidden_keys[section] = set()
+            hidden_keys[section].add(key)
+
+valid_values = {}
+
+for section, keys in tooltips.items():
+    for key, tip in keys.items():
+        # Look for lines like "Valid values: 0 = Off, 1 = On, 2 = Something"
+        match = re.search(r"Valid values?:\s*(.+)", tip, re.IGNORECASE)
+        if match:
+            values_str = match.group(1)
+            # Split by comma, then by '='
+            value_map = {}
+            for part in values_str.split(','):
+                if '=' in part:
+                    val, desc = part.split('=', 1)
+                    value_map[desc.strip()] = val.strip()
+            if value_map:
+                if section not in valid_values:
+                    valid_values[section] = {}
+                valid_values[section][key] = value_map
