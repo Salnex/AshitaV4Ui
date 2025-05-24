@@ -1,13 +1,13 @@
 # AshitaV4Ui
 
-AshitaV4Ui is a project designed to provide a user-friendly interface for managing INI files related to the Ashita launcher for Final Fantasy XI. This application allows users to easily edit and create INI configurations, manage game settings, and customize their gaming experience.
+AshitaV4Ui is a interface for managing INI files related to the Ashita v4 for Final Fantasy XI. 
 
 ## Project Structure
 
 ```
 AshitaV4Ui
 ├── src
-│   ├── Main.py          # Contains the main application logic, including download threads and dialog classes.
+│   ├── Main.py          # Contains the main application logic.
 │   └── ini_data.py      # Contains the INI key structure and tooltips for configuration settings.
 └── README.md            # Documentation for the project.
 ```
@@ -28,7 +28,7 @@ AshitaV4Ui
    ```
    cd AshitaV4Ui
    ```
-3. Install the required dependencies:
+3. Install the required dependencies:  
    qtpy  
    PyQt6  
    requests
