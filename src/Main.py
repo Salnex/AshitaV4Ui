@@ -8,7 +8,7 @@ import os
 import shutil
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
-from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys, padmode000_options, padsin000_options
+from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys, padmode000_options, padsin000_options, ui_metadata
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
@@ -90,33 +90,37 @@ class NewIniDialog(QtWidgets.QDialog):
 
         # Tabs for each section, each with a scroll area
         self.tabs = QtWidgets.QTabWidget()
-
-        # Prepare a special tab for gamepad options
-        gamepad_tab = QtWidgets.QWidget()
-        gamepad_layout = QtWidgets.QFormLayout(gamepad_tab)
-        gamepad_inputs = {}
+        tab_widgets = {}      
+        tab_inputs = {}    
 
         for section, keys in self.ini_structure.items():
-            scroll = QtWidgets.QScrollArea()
-            scroll.setWidgetResizable(True)
-            tab_content = QtWidgets.QWidget()
-            tab_layout = QtWidgets.QFormLayout(tab_content)
-            self.inputs[section] = {}
             for key, default in keys.items():
-                # Skip hidden keys
-                if key in hidden_keys.get(section, set()):
+                meta = ui_metadata.get(section, {}).get(key, {"widget": "lineedit", "show": True, "tab": section})
+                if not meta.get("show", True):
                     continue
+                tab_name = meta.get("tab", section)
+                if tab_name not in tab_widgets:
+                    scroll = QtWidgets.QScrollArea()
+                    scroll.setWidgetResizable(True)
+                    tab_content = QtWidgets.QWidget()
+                    tab_layout = QtWidgets.QFormLayout(tab_content)
+                    scroll.setWidget(tab_content)
+                    self.tabs.addTab(scroll, tab_name)
+                    tab_widgets[tab_name] = (scroll, tab_layout)
+                    tab_inputs[tab_name] = {}
+                _, tab_layout = tab_widgets[tab_name]
+                if section not in tab_inputs[tab_name]:
+                    tab_inputs[tab_name][section] = {}
                 label_text = friendly_names.get(section, {}).get(key, key)
-                tooltip = self.tooltips.get(section, {}).get(key, "")
-                # Use dropdown if valid values exist
+                tooltip = tooltips.get(section, {}).get(key, "")
                 valid = valid_values.get(section, {}).get(key)
+                widget_type = meta.get("widget", "lineedit")
 
-                # Move gamepad options to the special tab
-                if section == "ffxi.registry" and key == "padmode000":
+                # Special handling for gamepad groups
+                if widget_type == "padmode_group":
                     groupbox = QtWidgets.QGroupBox(label_text)
                     vbox = QtWidgets.QVBoxLayout(groupbox)
                     checkboxes = []
-                    # Default is a comma-separated string, e.g. "1,0,1,0,1,1"
                     default_values = [x.strip() for x in default.split(",")] if default else ["0"] * 6
                     for i, (opt_label, opt_tip) in enumerate(padmode000_options):
                         cb = QtWidgets.QCheckBox(opt_label)
@@ -126,14 +130,12 @@ class NewIniDialog(QtWidgets.QDialog):
                         vbox.addWidget(cb)
                         checkboxes.append(cb)
                     groupbox.setToolTip(tooltip)
-                    gamepad_inputs[key] = checkboxes
-                    gamepad_layout.addRow(groupbox)
-                    continue
-                elif section == "ffxi.registry" and key == "padsin000":
+                    tab_inputs[tab_name][section][key] = checkboxes
+                    tab_layout.addRow(groupbox)
+                elif widget_type == "padsin_group":
                     groupbox = QtWidgets.QGroupBox(label_text)
                     vbox = QtWidgets.QVBoxLayout(groupbox)
                     spinboxes = []
-                    # Default is a comma-separated string, e.g. "0,1,2,..."
                     default_values = [x.strip() for x in default.split(",")] if default else ["0"] * 27
                     for i, (desc, tip) in enumerate(padsin000_options):
                         hbox = QtWidgets.QHBoxLayout()
@@ -153,53 +155,55 @@ class NewIniDialog(QtWidgets.QDialog):
                         vbox.addLayout(hbox)
                         spinboxes.append(spin)
                     groupbox.setToolTip(tooltip)
-                    gamepad_inputs[key] = spinboxes
-                    gamepad_layout.addRow(groupbox)
-                    continue
-                elif section == "ffxi.registry" and key == "padguid000":
-                    edit = QtWidgets.QLineEdit(default)
-                    edit.setToolTip(tooltip)
-                    label = QtWidgets.QLabel(label_text)
-                    label.setToolTip(tooltip)
-                    gamepad_inputs[key] = edit
-                    gamepad_layout.addRow(label, edit)
-                    continue
-
-                # All other keys as before
-                if valid:
-                    combo = QtWidgets.QComboBox()
-                    combo.setToolTip(tooltip)
-                    # Add items as (label, value)
-                    for label, value in valid.items():
-                        combo.addItem(label, value)
-                        # Set default if matches
-                        if str(default) == str(value):
-                            combo.setCurrentText(label)
-                    label = QtWidgets.QLabel(label_text)
-                    label.setToolTip(tooltip)
-                    self.inputs[section][key] = combo
-                    tab_layout.addRow(label, combo)
-                elif "boolean" in tooltip.lower():
+                    tab_inputs[tab_name][section][key] = spinboxes
+                    tab_layout.addRow(groupbox)
+                elif widget_type == "checkbox":
                     checkbox = QtWidgets.QCheckBox()
                     checkbox.setChecked(str(default).lower() in ("1", "true", "yes", "on"))
                     checkbox.setToolTip(tooltip)
                     label = QtWidgets.QLabel(label_text)
                     label.setToolTip(tooltip)
-                    self.inputs[section][key] = checkbox
+                    tab_inputs[tab_name][section][key] = checkbox
                     tab_layout.addRow(label, checkbox)
+                elif widget_type == "combobox" and valid:
+                    combo = QtWidgets.QComboBox()
+                    combo.setToolTip(tooltip)
+                    for label_val, value in valid.items():
+                        combo.addItem(label_val, value)
+                        if str(default) == str(value):
+                            combo.setCurrentText(label_val)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    tab_inputs[tab_name][section][key] = combo
+                    tab_layout.addRow(label, combo)
+                elif widget_type == "spinbox":
+                    spin = QtWidgets.QSpinBox()
+                    spin.setMinimum(-99999)
+                    spin.setMaximum(99999)
+                    try:
+                        spin.setValue(int(default))
+                    except Exception:
+                        spin.setValue(0)
+                    spin.setToolTip(tooltip)
+                    label = QtWidgets.QLabel(label_text)
+                    label.setToolTip(tooltip)
+                    tab_inputs[tab_name][section][key] = spin
+                    tab_layout.addRow(label, spin)
                 else:
                     edit = QtWidgets.QLineEdit(default)
                     edit.setToolTip(tooltip)
                     label = QtWidgets.QLabel(label_text)
                     label.setToolTip(tooltip)
-                    self.inputs[section][key] = edit
+                    tab_inputs[tab_name][section][key] = edit
                     tab_layout.addRow(label, edit)
-            scroll.setWidget(tab_content)
-            self.tabs.addTab(scroll, section)
 
-        # Add the gamepad tab last
-        self.inputs["gamepad"] = gamepad_inputs
-        self.tabs.addTab(gamepad_tab, "Gamepad")
+        self.inputs = {}
+        for tab in tab_inputs:
+            for section in tab_inputs[tab]:
+                if section not in self.inputs:
+                    self.inputs[section] = {}
+                self.inputs[section].update(tab_inputs[tab][section])
+
         layout.addWidget(self.tabs)
 
         # Save/Cancel buttons
@@ -249,7 +253,6 @@ class NewIniDialog(QtWidgets.QDialog):
         gamepad_inputs = self.inputs.get("gamepad", {})
         if "ffxi.registry" not in config:
             config["ffxi.registry"] = {}
-
 
         # padmode000: checkboxes
         padmode = gamepad_inputs.get("padmode000")
