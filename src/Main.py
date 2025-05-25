@@ -8,7 +8,7 @@ import os
 import shutil
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
-from ini_data import ini_structure, tooltips, friendly_names, valid_values, hidden_keys, padmode000_options, padsin000_options, ui_metadata
+from ini_data import ini_structure, tooltips, friendly_names, valid_values, padmode000_options, padsin000_options, ui_metadata
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):

@@ -859,15 +859,6 @@ ui_metadata = {
     }
 }
 
-hidden_keys = {}
-
-for section, keys in tooltips.items():
-    for key, tip in keys.items():
-        if "Unknown / unused." in tip:
-            if section not in hidden_keys:
-                hidden_keys[section] = set()
-            hidden_keys[section].add(key)
-
 valid_values = {}
 
 for section, keys in tooltips.items():
