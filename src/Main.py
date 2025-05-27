@@ -33,7 +33,7 @@ class DownloadThread(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
-
+#Show a dialog to edit an existing INI file
 class IniEditorDialog(QtWidgets.QDialog):
     def __init__(self, ini_path, parent=None):
         super().__init__(parent)
@@ -68,7 +68,7 @@ class IniEditorDialog(QtWidgets.QDialog):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to save INI file:\n{e}")
 
-
+# Dialog to create a new INI file
 class NewIniDialog(QtWidgets.QDialog):
     def __init__(self, ini_dir, parent=None):
         super().__init__(parent)
@@ -113,7 +113,7 @@ class NewIniDialog(QtWidgets.QDialog):
                     tab_inputs[tab_name][section] = {}
                 label_text = friendly_names.get(section, {}).get(key, key)
                 tooltip = tooltips.get(section, {}).get(key, "")
-                valid = valid_values.get(section, {}).get(key)
+                valid = meta.get("valid_values")
                 widget_type = meta.get("widget", "lineedit")
 
                 # Special handling for gamepad groups
@@ -232,52 +232,44 @@ class NewIniDialog(QtWidgets.QDialog):
             return
 
         config = configparser.ConfigParser()
+
         for section, keys in self.ini_structure.items():
             config[section] = {}
-            # Write visible keys from UI (excluding gamepad keys)
-            for key, widget in self.inputs.get(section, {}).items():
-                if key in ("padmode000", "padsin000", "padguid000") and section == "ffxi.registry":
-                    continue  # These are handled in the gamepad tab
-                if isinstance(widget, QtWidgets.QCheckBox):
-                    config[section][key] = "1" if widget.isChecked() else "0"
-                elif isinstance(widget, QtWidgets.QComboBox):
-                    config[section][key] = widget.currentData()
-                else:
-                    config[section][key] = widget.text()
-            # Write hidden keys with their default values
             for key, default in keys.items():
-                if key in hidden_keys.get(section, set()):
+                # Skip hidden keys for now, add them after
+                meta = ui_metadata.get(section, {}).get(key, {"widget": "lineedit", "show": True, "tab": section})
+                if not meta.get("show", True):
+                    continue
+
+                widget = self.inputs.get(section, {}).get(key)
+                widget_type = meta.get("widget", "lineedit")
+
+                if widget is None:
+                    continue  # Shouldn't happen, but safety first
+
+                if widget_type == "padmode_group":
+                    values = ["1" if cb.isChecked() else "0" for cb in widget]
+                    config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
+                elif widget_type == "padsin_group":
+                    values = [str(spin.value()) for spin in widget]
+                    config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
+                elif widget_type == "checkbox":
+                    config[section][key] = "1" if widget.isChecked() else "0"
+                elif widget_type == "combobox":
+                    if isinstance(widget, QtWidgets.QComboBox):
+                        config[section][key] = widget.currentData()
+                    else:
+                        config[section][key] = widget.text()
+                elif widget_type == "spinbox":
+                    config[section][key] = str(widget.value())
+                else:  # lineedit and fallback
+                    config[section][key] = widget.text()
+
+            # Add hidden keys with their default values
+            for key, default in keys.items():
+                meta = ui_metadata.get(section, {}).get(key, {"widget": "lineedit", "show": True, "tab": section})
+                if not meta.get("show", True) and key not in config[section]:
                     config[section][key] = default
-
-        # Write gamepad tab values into ffxi.registry
-        gamepad_inputs = self.inputs.get("gamepad", {})
-        if "ffxi.registry" not in config:
-            config["ffxi.registry"] = {}
-
-        # padmode000: checkboxes
-        padmode = gamepad_inputs.get("padmode000")
-        if padmode:
-            values = ["1" if cb.isChecked() else "0" for cb in padmode]
-            # If all are "0" (unchecked), treat as default and write "-1"
-            if all(v == "0" for v in values):
-                config["ffxi.registry"]["padmode000"] = "-1"
-            else:
-                config["ffxi.registry"]["padmode000"] = ",".join(values)
-
-        # padsin000: spinboxes
-        padsin = gamepad_inputs.get("padsin000")
-        if padsin:
-            values = [str(spin.value()) for spin in padsin]
-            # If all are "0", treat as default and write "-1"
-            if all(v == "0" for v in values):
-                config["ffxi.registry"]["padsin000"] = "-1"
-            else:
-                config["ffxi.registry"]["padsin000"] = ",".join(values)
-
-        # padguid000: line edit
-        padguid = gamepad_inputs.get("padguid000")
-        if padguid:
-            config["ffxi.registry"]["padguid000"] = padguid.text()
 
         try:
             with open(ini_path, "w") as f:
@@ -287,7 +279,7 @@ class NewIniDialog(QtWidgets.QDialog):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Error", f"Failed to create INI:\n{e}")
 
-
+# Main window for the application
 class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()

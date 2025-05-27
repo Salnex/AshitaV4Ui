@@ -43,7 +43,7 @@ ini_structure = {
         "sandbox": "0"
     },
     "ashita.polplugins.args": {
-        ";sandbox": ""
+        "sandbox": ""
     },
     "ashita.resources": {
         "offsets.use_overrides": "1",
@@ -266,7 +266,7 @@ tooltips = {
         ),
     },
     "ashita.polplugins.args": {
-        ";sandbox": (
+        "sandbox": (
             "Contains the plugin-specific arguments to pass to a 'PlayOnline Plugin' when its loaded.\n"
             "This section expects each entry to be the name of the plugin and a string value of arguments to be passed to the plugin when its loaded.\n"
             "Type: string"
@@ -657,7 +657,7 @@ friendly_names = {
         "sandbox": "Enable Sandbox Plugin",
     },
     "ashita.polplugins.args": {
-        ";sandbox": "Sandbox Plugin Arguments",
+        "sandbox": "Sandbox Plugin Arguments",
     },
     "ashita.resources": {
         "offsets.use_overrides": "Use Offsets Overrides",
@@ -738,54 +738,54 @@ friendly_names = {
 
 ui_metadata = {
     "ashita.launcher": {
-        "autoclose": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "name": {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "autoclose":    {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "name":         {"widget": "lineedit", "show": True, "tab": "Ashita"},
     },
     "ashita.boot": {
-        "file": {"widget": "lineedit", "show": True, "tab": "Ashita"},
-        "command": {"widget": "lineedit", "show": True, "tab": "Ashita"},
-        "gamemodule": {"widget": "lineedit", "show": True, "tab": "Ashita"},
-        "script": {"widget": "lineedit", "show": True, "tab": "Ashita"},
-        "args": {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "file":         {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "command":      {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "gamemodule":   {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "script":       {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "args":         {"widget": "lineedit", "show": True, "tab": "Ashita"},
     },
     "ashita.fonts": {
         "d3d8.disable_scaling": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "d3d8.family": {"widget": "lineedit", "show": True, "tab": "Ashita"},
-        "d3d8.height": {"widget": "spinbox", "show": True, "tab": "Ashita"},
+        "d3d8.family":          {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "d3d8.height":          {"widget": "spinbox",  "show": True, "tab": "Ashita"},
     },
     "ashita.input": {
-        "gamepad.allowbackground": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "gamepad.disableenumeration": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "keyboard.blockinput": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "keyboard.blockbindsduringinput": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "keyboard.silentbinds ": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "keyboard.windowskeyenabled": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "mouse.blockinput": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "mouse.unhook": {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "gamepad.allowbackground":          {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "gamepad.disableenumeration":       {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "keyboard.blockinput":              {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "keyboard.blockbindsduringinput":   {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "keyboard.silentbinds ":            {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "keyboard.windowskeyenabled":       {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "mouse.blockinput":                 {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "mouse.unhook":                     {"widget": "checkbox", "show": True, "tab": "Ashita"},
     },
     "ashita.language": {
-        "playonline": {"widget": "combobox", "show": True, "tab": "Ashita"},
-        "ashita": {"widget": "combobox", "show": True, "tab": "Ashita"},
+        "playonline":   {"widget": "combobox", "show": True, "tab": "Ashita", "valid_values": {"Default": "0", "Japanese": "1", "English": "2","European": "3"} },
+        "ashita":       {"widget": "combobox", "show": True, "tab": "Ashita", "valid_values": {"Default": "0", "Japanese": "1", "English": "2","European": "3"} },
     },
     "ashita.logging": {
-        "level": {"widget": "combobox", "show": True, "tab": "Ashita"},
-        "crashdumps": {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "level":        {"widget": "combobox", "show": True, "tab": "Ashita", "valid_values": {'None': '0', 'Critical': '1', 'Error': '2', 'Warn': '3', 'Info': '4', 'Debug': '5'}},
+        "crashdumps":   {"widget": "checkbox", "show": True, "tab": "Ashita"},
     },
     "ashita.misc": {
-        "addons.silent": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "aliases.silent": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "plugins.silent": {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "addons.silent":    {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "aliases.silent":   {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "plugins.silent":   {"widget": "checkbox", "show": True, "tab": "Ashita"},
     },
     "ashita.polplugins": {
         "sandbox": {"widget": "checkbox", "show": True, "tab": "Ashita"},
     },
     "ashita.polplugins.args": {
-        ";sandbox": {"widget": "lineedit", "show": True, "tab": "Ashita"},
+        "sandbox": {"widget": "lineedit", "show": True, "tab": "Ashita"},
     },
     "ashita.resources": {
-        "offsets.use_overrides": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "pointers.use_overrides": {"widget": "checkbox", "show": True, "tab": "Ashita"},
-        "resources.use_overrides": {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "offsets.use_overrides":    {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "pointers.use_overrides":   {"widget": "checkbox", "show": True, "tab": "Ashita"},
+        "resources.use_overrides":  {"widget": "checkbox", "show": True, "tab": "Ashita"},
     },
     "ashita.taskpool": {
         "threadcount": {"widget": "spinbox", "show": True, "tab": "Ashita"},
@@ -795,85 +795,66 @@ ui_metadata = {
         "y": {"widget": "spinbox", "show": True, "tab": "Ashita"},
     },
     "ffxi.direct3d8": {
-        "presentparams.backbufferformat": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.backbuffercount": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.multisampletype": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.swapeffect": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.enableautodepthstencil": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.autodepthstencilformat": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.flags": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.fullscreen_refreshrateinhz": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "presentparams.fullscreen_presentationinterval": {"widget": "spinbox", "show": True, "tab": "Direct3D8"},
-        "behaviorflags.fpu_preserve": {"widget": "checkbox", "show": True, "tab": "Direct3D8"},
+        "presentparams.backbufferformat":                   {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.backbuffercount":                    {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.multisampletype":                    {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.swapeffect":                         {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.enableautodepthstencil":             {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.autodepthstencilformat":             {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.flags":                              {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.fullscreen_refreshrateinhz":         {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "presentparams.fullscreen_presentationinterval":    {"widget": "spinbox",   "show": True, "tab": "Direct3D8"},
+        "behaviorflags.fpu_preserve":                       {"widget": "checkbox",  "show": True, "tab": "Direct3D8"},
     },
     "ffxi.registry": {
-        "0000": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0001": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0002": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0003": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0004": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0005": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0006": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0007": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0008": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0009": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0010": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0011": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0012": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0013": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0014": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0015": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0016": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0017": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0018": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0019": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0020": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0021": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0022": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0023": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0024": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0025": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0026": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0027": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0028": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0029": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0030": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0031": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0032": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0033": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "0034": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0035": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0036": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0037": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0038": {"widget": "spinbox", "show": True, "tab": "FFXI Registry"},
-        "0039": {"widget": "combobox", "show": True, "tab": "FFXI Registry"},
-        "0040": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0041": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0042": {"widget": "lineedit", "show": True, "tab": "FFXI Registry"},
-        "0043": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0044": {"widget": "checkbox", "show": True, "tab": "FFXI Registry"},
-        "0045": {"widget": "spinbox", "show": False, "tab": "FFXI Registry"},
-        "padmode000": {"widget": "padmode_group", "show": True, "tab": "Gamepad"},
-        "padsin000": {"widget": "padsin_group", "show": True, "tab": "Gamepad"},
-        "padguid000": {"widget": "lineedit", "show": True, "tab": "Gamepad"},
+        "0000": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1', 'Lowest Quality ... 6': 'On'}},
+        "0001": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0002": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0003": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0004": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0005": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0006": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0007": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Disabled': '0', 'Enabled': '1'}},
+        "0008": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0009": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0010": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0011": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'Normal': '1', 'Smooth': '2'}},
+        "0012": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0013": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0014": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0015": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0016": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0017": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0018": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'High': '0', 'Low': '1', 'Uncompressed': '2'}},
+        "0019": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Compressed': '0', 'Uncompressed': '1'}},
+        "0020": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0021": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0022": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0023": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0024": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0025": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0026": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0027": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0028": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0029": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry", "valid_values": {'Lowest': '20', 'Highest': '12'}},
+        "0030": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Disabled': '0', 'Enabled': '1'}},
+        "0031": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0032": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0033": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "0034": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Fullscreen': '0', 'Windowed': '1', 'Fullscreen Windowed (Undocumented)': '2', 'Borderless Windowed': '3'}},
+        "0035": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0036": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Compressed': '0', 'Uncompressed': '1', 'High Quality': '2'}},
+        "0037": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0038": {"widget": "spinbox",  "show": True,  "tab": "FFXI Registry"},
+        "0039": {"widget": "combobox", "show": True,  "tab": "FFXI Registry", "valid_values": {'v1': '0', 'v2': '1'}},
+        "0040": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0041": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Disabled': '0', 'Enabled': '1'}},
+        "0042": {"widget": "lineedit", "show": True,  "tab": "FFXI Registry"},
+        "0043": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0044": {"widget": "checkbox", "show": True,  "tab": "FFXI Registry", "valid_values": {'Off': '0', 'On': '1'}},
+        "0045": {"widget": "spinbox",  "show": False, "tab": "FFXI Registry"},
+        "padmode000":   {"widget": "padmode_group", "show": True, "tab": "Gamepad"},
+        "padsin000":    {"widget": "padsin_group",  "show": True, "tab": "Gamepad"},
+        "padguid000":   {"widget": "lineedit",      "show": True, "tab": "Gamepad"},
     }
 }
-
-valid_values = {}
-
-for section, keys in tooltips.items():
-    for key, tip in keys.items():
-        # Look for lines like "Valid values: 0 = Off, 1 = On, 2 = Something"
-        match = re.search(r"Valid values?:\s*(.+)", tip, re.IGNORECASE)
-        if match:
-            values_str = match.group(1)
-            # Split by comma, then by '='
-            value_map = {}
-            for part in values_str.split(','):
-                if '=' in part:
-                    val, desc = part.split('=', 1)
-                    value_map[desc.strip()] = val.strip()
-            if value_map:
-                if section not in valid_values:
-                    valid_values[section] = {}
-                valid_values[section][key] = value_map
