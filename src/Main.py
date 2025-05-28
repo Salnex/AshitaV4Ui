@@ -1,5 +1,5 @@
 # Contents of /AshitaV4Ui/AshitaV4Ui/src/Main.py
-
+import ctypes
 import sys
 import requests
 import zipfile
@@ -8,6 +8,15 @@ import os
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
 from ini_data import ini_structure, tooltips, friendly_names, padmode000_options, padsin000_options, ui_metadata
+
+def run_as_admin(exe_path, args, cwd):
+    params = f'"{exe_path}" {args}'
+    try:
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", exe_path, args, cwd, 1
+        )
+    except Exception as e:
+        QtWidgets.QMessageBox.critical(None, "Error", f"Failed to elevate:\n{e}")
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
@@ -400,6 +409,9 @@ class MainWindow(QtWidgets.QWidget):
         try:
             if sys.platform.startswith("linux"):
                 subprocess.Popen(['wine', ashita_path, profile], cwd=os.path.dirname(ashita_path))
+            elif sys.platform.startswith("win"):
+                run_as_admin(ashita_path, profile, os.path.dirname(ashita_path))
+                QtWidgets.QMessageBox.information(self, "Launched", f"Launched Ashita with profile: {profile}")
             else:
                 subprocess.Popen([ashita_path, profile], cwd=os.path.dirname(ashita_path))            
                 QtWidgets.QMessageBox.information(self, "Launched", f"Launched Ashita with profile: {profile}")
