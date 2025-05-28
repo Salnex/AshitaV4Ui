@@ -13,7 +13,7 @@ AshitaV4Ui
 ```
 
 ## Features
-
+- **Ashita Launching and downloading**: Launch existing profiles or those created with this tool
 - **INI File Editing**: Users can open, edit, and save INI files with a simple text editor interface.
 - **INI File Creation**: Users can create new INI files with predefined structures and default values.
 - **Tooltips**: Each INI key has an associated tooltip that provides detailed information about its purpose and valid values.
@@ -36,4 +36,11 @@ AshitaV4Ui
 ## Usage
 
 To run the application, execute the `Main.py` file. The application will provide a graphical interface for managing INI files.
+
+## Screenshots
+![Main Window](CreateINIWindowAshitaTab.png)
+![INI Editor Ashita](CreateINIWindowAshitaTab.png)
+![INI Editor D3D](CreateINIWindowFFXIRegistryTab.png)
+![INI Editor Registry](CreateINIWindowFFXIRegistryTab.png)
+![INI Editor Gamepad](CreateINIWindowGamepadTab.png)
 
