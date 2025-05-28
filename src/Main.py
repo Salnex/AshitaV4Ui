@@ -18,6 +18,14 @@ def run_as_admin(exe_path, args, cwd):
     except Exception as e:
         QtWidgets.QMessageBox.critical(None, "Error", f"Failed to elevate:\n{e}")
 
+def get_app_dir():
+    if getattr(sys, 'frozen', False):
+        # Running as a PyInstaller bundle
+        return os.path.dirname(sys.executable)
+    else:
+        # Running as a script
+        return os.path.dirname(os.path.abspath(__file__))
+
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
     finished = Signal(str)
@@ -318,7 +326,7 @@ class MainWindow(QtWidgets.QWidget):
     def refresh_profiles(self):
         # Find all .ini files in the config/boot directory
         ini_dir = os.path.join(
-            os.path.dirname(__file__),
+            get_app_dir(),
             "Ashita-v4beta-main", "config", "boot"
         )
         self.profile_dropdown.clear()
@@ -329,7 +337,7 @@ class MainWindow(QtWidgets.QWidget):
 
     def start_download(self):
         url = "https://github.com/AshitaXI/Ashita-v4beta/archive/refs/heads/main.zip"
-        project_root = os.path.dirname(os.path.abspath(__file__))
+        project_root = get_app_dir()
         dest_path = os.path.join(project_root, "ashita_download.zip")
 
         self.download_button.setEnabled(False)
@@ -343,7 +351,7 @@ class MainWindow(QtWidgets.QWidget):
     def download_finished(self, path):
         self.status_label.setText(f"Download complete: {path}")
         self.download_button.setEnabled(True)
-        project_root = os.path.dirname(os.path.abspath(__file__))
+        project_root = get_app_dir()
         extract_dir = project_root
         try:
             with zipfile.ZipFile(path, 'r') as zip_ref:
@@ -365,7 +373,7 @@ class MainWindow(QtWidgets.QWidget):
 
     #def show_ini_popup(self):
     #    ini_path = os.path.join(
-    #        os.path.dirname(__file__),
+    #        get_app_dir(),
     #        "Ashita-v4beta-main", "config", "boot", "example.ini"
     #    )
     #    if not os.path.exists(ini_path):
@@ -377,7 +385,7 @@ class MainWindow(QtWidgets.QWidget):
 
     def create_new_ini(self):
         ini_dir = os.path.join(
-            os.path.dirname(__file__),
+            get_app_dir(),
             "Ashita-v4beta-main", "config", "boot"
         )
         os.makedirs(ini_dir, exist_ok=True)
@@ -391,11 +399,11 @@ class MainWindow(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Profile", "Please select a profile to launch.")
             return
         ashita_path = os.path.join(
-            os.path.dirname(__file__),
+            get_app_dir(),
             "Ashita-v4beta-main", "Ashita-cli.exe"
         )
         ini_path = os.path.join(
-            os.path.dirname(__file__),
+            get_app_dir(),
             "Ashita-v4beta-main", "config", "boot", profile
         )
         if not os.path.isfile(ashita_path):
