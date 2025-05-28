@@ -5,10 +5,9 @@ import requests
 import zipfile
 import configparser
 import os
-import shutil
 from qtpy import QtWidgets
 from qtpy.QtCore import QThread, Signal
-from ini_data import ini_structure, tooltips, friendly_names, valid_values, padmode000_options, padsin000_options, ui_metadata
+from ini_data import ini_structure, tooltips, friendly_names, padmode000_options, padsin000_options, ui_metadata
 
 # Worker thread to handle the download in the background
 class DownloadThread(QThread):
@@ -284,26 +283,45 @@ class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle("Ashita v4 UI")
-
+        self.profile_dropdown = QtWidgets.QComboBox()
+        self.profile_launch_button = QtWidgets.QPushButton("Launch Ashita with Profile")
+        self.refresh_profiles()
         self.download_button = QtWidgets.QPushButton("Download Ashita v4")
         self.status_label = QtWidgets.QLabel("Status: Idle")
         #self.show_ini_button = QtWidgets.QPushButton("Show INI File")
         self.create_ini_button = QtWidgets.QPushButton("Create New INI")
 
         layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(QtWidgets.QLabel("Select Profile:"))
+        layout.addWidget(self.profile_dropdown)
+        layout.addWidget(self.profile_launch_button)
         layout.addWidget(self.download_button)
         #layout.addWidget(self.show_ini_button)
         layout.addWidget(self.create_ini_button)
         layout.addWidget(self.status_label)
         self.setLayout(layout)
 
+        self.profile_launch_button.clicked.connect(self.launch_ashita)
         self.download_button.clicked.connect(self.start_download)
         #self.show_ini_button.clicked.connect(self.show_ini_popup)
         self.create_ini_button.clicked.connect(self.create_new_ini)
 
+    def refresh_profiles(self):
+        # Find all .ini files in the config/boot directory
+        ini_dir = os.path.join(
+            os.path.dirname(__file__),
+            "Ashita-v4beta-main", "config", "boot"
+        )
+        self.profile_dropdown.clear()
+        if os.path.isdir(ini_dir):
+            for fname in os.listdir(ini_dir):
+                if fname.lower().endswith(".ini"):
+                    self.profile_dropdown.addItem(fname)
+
     def start_download(self):
         url = "https://github.com/AshitaXI/Ashita-v4beta/archive/refs/heads/main.zip"
-        dest_path = "downloaded_file.zip"
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        dest_path = os.path.join(project_root, "ashita_download.zip")
 
         self.download_button.setEnabled(False)
         self.status_label.setText("Status: Downloading...")
@@ -316,7 +334,8 @@ class MainWindow(QtWidgets.QWidget):
     def download_finished(self, path):
         self.status_label.setText(f"Download complete: {path}")
         self.download_button.setEnabled(True)
-        extract_dir = "."
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        extract_dir = project_root
         try:
             with zipfile.ZipFile(path, 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
@@ -355,7 +374,37 @@ class MainWindow(QtWidgets.QWidget):
         os.makedirs(ini_dir, exist_ok=True)
         dialog = NewIniDialog(ini_dir, self)
         dialog.exec_()
+        self.refresh_profiles()
 
+    def launch_ashita(self):
+        profile = self.profile_dropdown.currentText()
+        if not profile:
+            QtWidgets.QMessageBox.warning(self, "No Profile", "Please select a profile to launch.")
+            return
+        ashita_path = os.path.join(
+            os.path.dirname(__file__),
+            "Ashita-v4beta-main", "Ashita-cli.exe"
+        )
+        ini_path = os.path.join(
+            os.path.dirname(__file__),
+            "Ashita-v4beta-main", "config", "boot", profile
+        )
+        if not os.path.isfile(ashita_path):
+            QtWidgets.QMessageBox.critical(self, "Error", f"Ashita-cli.exe not found at:\n{ashita_path}")
+            return
+        if not os.path.isfile(ini_path):
+            QtWidgets.QMessageBox.critical(self, "Error", f"Profile INI not found at:\n{ini_path}")
+            return
+        # Launch Ashita with the selected profile
+        import subprocess
+        try:
+            if sys.platform.startswith("linux"):
+                subprocess.Popen(['wine', ashita_path, profile], cwd=os.path.dirname(ashita_path))
+            else:
+                subprocess.Popen([ashita_path, profile], cwd=os.path.dirname(ashita_path))            
+                QtWidgets.QMessageBox.information(self, "Launched", f"Launched Ashita with profile: {profile}")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Failed to launch Ashita:\n{e}")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
