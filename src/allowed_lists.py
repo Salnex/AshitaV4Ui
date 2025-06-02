@@ -1,0 +1,6 @@
+allowed_list = {
+    "GaiaXI": {"addons", "affinity", "allmaps", "ashitacast", "aspect", "autojoin", "autorespond", "blucheck", "blumon", "blusets", "butterfeet", "casper", "cfhblock", "chamcham", "chains", "changecall", "chatfix", "chatmon", "checker", "cleancs", "clock", "config", "craftmon", "cureplease", "debuff", "distance", "drawdistance", "enternity", "equipmon", "filterless", "filters", "filterscan", "fps", "freemem", "hardwaremouse", "hgather", "hideconsole", "hideui", "hxui", "ime", "imguistyle", "instantah", "instantchat", "itemwatch", "ja0wait", "libs", "links", "logincmd", "logs", "macrofix", "mapdot", "minimap", "minimapmon", "mipmap", "mobdb", "move", "noname", "partybuff", "petinfo", "points", "recast", "renamer", "rolltracker", "screenshot", "sexchange", "shorthand", "singlerace", "skillchains", "stfu", "timestamp", "tokens", "tparty", "thirdparty", "toon", "xicamera", "xipivot"},
+    "ServerA": {"distance", "fps", "move", "timestamp", "tparty", "thirdparty", "addons", "screenshot"},
+    "ServerB": {"pluginX", "pluginY", "addonZ"},
+    # Add more servers and their allowed plugins/addons here
+}
