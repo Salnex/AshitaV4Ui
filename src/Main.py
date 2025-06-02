@@ -430,47 +430,7 @@ class MainWindow(QtWidgets.QWidget):
     def open_addon_plugin_manager(self):
         dlg = AddonPluginManagerWindow(self)
         dlg.exec_()
-    def save_selection_to_file(self):
-        # Get Ashita root
-        ashita_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main"))
-        scripts_dir = os.path.join(ashita_root, "scripts")
-        os.makedirs(scripts_dir, exist_ok=True)
-        out_path = os.path.join(scripts_dir, "addons_plugins.txt")
-    
-        # Gather checked plugins
-        plugin_names = []
-        if hasattr(self, "plugin_table"):
-            for row in range(self.plugin_table.rowCount()):
-                widget = self.plugin_table.cellWidget(row, 0)
-                if widget:
-                    checkbox = widget.findChild(QtWidgets.QCheckBox)
-                    if checkbox and checkbox.isChecked():
-                        name_item = self.plugin_table.item(row, 1)
-                        if name_item:
-                            plugin_names.append(name_item.text())
-    
-        # Gather checked addons
-        addon_names = []
-        if hasattr(self, "addon_table"):
-            for row in range(self.addon_table.rowCount()):
-                widget = self.addon_table.cellWidget(row, 0)
-                if widget:
-                    checkbox = widget.findChild(QtWidgets.QCheckBox)
-                    if checkbox and checkbox.isChecked():
-                        name_item = self.addon_table.item(row, 1)
-                        if name_item:
-                            addon_names.append(name_item.text())
-    
-        # Write to file
-        with open(out_path, "w", encoding="utf-8") as f:
-            for plugin in plugin_names:
-                f.write(f"/load {plugin}\n")
-            f.write("\n")
-            for addon in addon_names:
-                f.write(f"/addon load {addon}\n")
-        print(f"[DEBUG] Saved selection to {out_path}")
-    
-    # Call this in your OK button handler:
+
     def accept(self):
         self.save_selection_to_file()
         super().accept()       

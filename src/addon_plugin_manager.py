@@ -1,7 +1,8 @@
 import os
 import re
 from qtpy import QtWidgets
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtGui
+from qtpy.QtCore import Qt
 from plugin_descriptions import PLUGIN_DESCRIPTIONS
 from allowed_lists import allowed_list
 
@@ -20,6 +21,54 @@ def extract_addon_description(lua_path):
         pass
     return None
 
+def qt_keyseq_to_ashita(keyseq_str):
+    # Replace Qt modifiers with Ashita symbols
+    # Order: Ctrl, Alt, Shift
+    out = keyseq_str
+    out = out.replace("Ctrl+", "^")
+    out = out.replace("Alt+", "!")
+    out = out.replace("Shift+", "@")
+    return out
+
+class KeybindButton(QtWidgets.QPushButton):
+    def __init__(self, key_text, parent=None):
+        super().__init__(key_text, parent)
+        self.listening = False
+        self.default_text = key_text
+
+    def start_listening(self):
+        self.setText("Press a key...")
+        self.listening = True
+        self.grabKeyboard()
+
+    def keyPressEvent(self, event):
+        if self.listening:
+            key = event.key()
+            mods = event.modifiers()
+            mods = mods.value  # PySide6/QtPy
+            # List of modifier keys to ignore as a "real" keypress
+            modifier_keys = {
+                Qt.Key_Control,
+                Qt.Key_Shift,
+                Qt.Key_Alt,
+                Qt.Key_Meta,
+                Qt.Key_Super_L,
+                Qt.Key_Super_R,
+                Qt.Key_AltGr,
+                Qt.Key_CapsLock,
+                Qt.Key_NumLock,
+                Qt.Key_ScrollLock,
+            }
+            if key in modifier_keys:
+                return  # Wait for a non-modifier key
+            key_seq = QtGui.QKeySequence(mods | key)
+            print(f"[DEBUG] Setting keybind to: {key_seq.toString()}")
+            self.setText(key_seq.toString())
+            self.listening = False
+            self.releaseKeyboard()
+        else:
+            print("[DEBUG] Not listening, passing to super().keyPressEvent")
+            super().keyPressEvent(event)
 
 class AddonPluginManagerWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
@@ -27,6 +76,10 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
         self.setWindowTitle("Addon & Plugin Manager")
         self.resize(600, 400)
         self.setup_ui()
+
+    def accept(self):
+        self.save_selection_to_file()
+        super().accept()
 
     def setup_ui(self):
         layout = QtWidgets.QVBoxLayout(self)
@@ -46,8 +99,10 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
         self.tabs = QtWidgets.QTabWidget()
         self.addons_tab = QtWidgets.QWidget()
         self.plugins_tab = QtWidgets.QWidget()
+        self.keybinds_tab = QtWidgets.QWidget()
         self.tabs.addTab(self.addons_tab, "Addons")
         self.tabs.addTab(self.plugins_tab, "Plugins")
+        self.tabs.addTab(self.keybinds_tab, "Keybinds")
 
         # Set layouts and tables
         self.addon_table = QtWidgets.QTableWidget()
@@ -74,6 +129,8 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
 
         layout.addWidget(self.tabs)
 
+        self.setup_keybinds_tab()
+
         # OK/Cancel buttons
         btn_layout = QtWidgets.QHBoxLayout()
         self.ok_btn = QtWidgets.QPushButton("OK")
@@ -88,90 +145,186 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
 
         self.refresh_tables()
         
+    def setup_keybinds_tab(self):
+        layout = QtWidgets.QVBoxLayout(self.keybinds_tab)
+        add_btn = QtWidgets.QPushButton("Add New Keybind")
+        layout.addWidget(add_btn)
+
+        self.keybinds_table = QtWidgets.QTableWidget()
+        self.keybinds_table.setColumnCount(2)
+        self.keybinds_table.setHorizontalHeaderLabels(["Key", "Command"])
+        self.keybinds_table.horizontalHeader().setStretchLastSection(True)
+        self.keybinds_table.verticalHeader().setVisible(False)
+        self.keybinds_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.keybinds_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.keybinds_table.setShowGrid(True)
+        layout.addWidget(self.keybinds_table)
+
+        # Default keybinds
+        default_keybinds = [
+            ("Insert", "/ashita"),
+            ("SYSRQ", "/screenshot hide"),
+            ("Ctrl+V", "/paste"),
+            ("F11", "/ambient"),
+            ("F12", "/fps"),
+            ("Ctrl+F1", "/ta <a10>"),
+            ("Ctrl+F2", "/ta <a11>"),
+            ("Ctrl+F3", "/ta <a12>"),
+            ("Ctrl+F4", "/ta <a13>"),
+            ("Ctrl+F5", "/ta <a14>"),
+            ("Ctrl+F6", "/ta <a15>"),
+            ("Alt+F1", "/ta <a20>"),
+            ("Alt+F2", "/ta <a21>"),
+            ("Alt+F3", "/ta <a22>"),
+            ("Alt+F4", "/ta <a23>"),
+            ("Alt+F5", "/ta <a24>"),
+            ("Alt+F6", "/ta <a25>"),
+        ]
+        self.keybinds_table.setRowCount(len(default_keybinds))
+        for row, (key, cmd) in enumerate(default_keybinds):
+            btn = KeybindButton(key)
+            btn.clicked.connect(btn.start_listening)
+            self.keybinds_table.setCellWidget(row, 0, btn)
+            cmd_edit = QtWidgets.QLineEdit(cmd)
+            self.keybinds_table.setCellWidget(row, 1, cmd_edit)
+
+        # Add new row when button is clicked
+        def add_new_keybind():
+            row = self.keybinds_table.rowCount()
+            self.keybinds_table.insertRow(row)
+            btn = KeybindButton("Unassigned")
+            btn.clicked.connect(btn.start_listening)
+            self.keybinds_table.setCellWidget(row, 0, btn)
+            cmd_edit = QtWidgets.QLineEdit("")
+            self.keybinds_table.setCellWidget(row, 1, cmd_edit)
+
+        add_btn.clicked.connect(add_new_keybind)
+    
     def refresh_tables(self):
         self.populate_addon_table()
         self.populate_plugin_table()
 
-    def populate_addon_table(self):
+    def populate_table(self, table, items_dir, allowed, prechecked_set, desc_lookup_func):
         # Clear table
-        self.addon_table.setRowCount(0)
-        # Look for folders in the addons/ directory
-        addons_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..","Ashita-v4beta-main", "addons")
-        addons_dir = os.path.abspath(addons_dir)
-
-        # Get allowed set for selected server
-        server = self.server_dropdown.currentText()
-        allowed = None
-        if server != "Show All":
-            allowed = {name.lower() for name in allowed_list.get(server, set())}
-
+        table.setRowCount(0)
         rows = []
-        if os.path.isdir(addons_dir):
-            for name in sorted(os.listdir(addons_dir)):
-                if allowed is not None and name.lower() not in allowed:
+        if os.path.isdir(items_dir):
+            for name in sorted(os.listdir(items_dir)):
+                item_path = os.path.join(items_dir, name)
+                # Only directories for addons, only .dll files for plugins
+                if desc_lookup_func == extract_addon_description:
+                    if not os.path.isdir(item_path):
+                        continue
+                    item_name = name
+                else:
+                    if not (os.path.isfile(item_path) and name.lower().endswith(".dll")):
+                        continue
+                    item_name = os.path.splitext(name)[0]
+                if allowed is not None and item_name.lower() not in allowed:
                     continue
-                full_path = os.path.join(addons_dir, name)
-                if os.path.isdir(full_path):
-                    lua_path = os.path.join(full_path, f"{name}.lua")
-                    desc = extract_addon_description(lua_path)
-                    rows.append((name, desc))
-        self.addon_table.setRowCount(len(rows))
+                desc = desc_lookup_func(os.path.join(item_path, f"{item_name}.lua") if desc_lookup_func == extract_addon_description else item_name)
+                rows.append((item_name, desc))
+        table.setRowCount(len(rows))
         for row_idx, (name, desc) in enumerate(rows):
             checkbox_widget = QtWidgets.QWidget()
             checkbox = QtWidgets.QCheckBox()
-            if name.lower() in PRECHECKED_ADDONS:
+            if name.lower() in prechecked_set:
                 checkbox.setChecked(True)
             checkbox_layout = QtWidgets.QHBoxLayout(checkbox_widget)
             checkbox_layout.addStretch()
             checkbox_layout.addWidget(checkbox)
             checkbox_layout.addStretch()
             checkbox_layout.setContentsMargins(0, 0, 0, 0)
-            self.addon_table.setCellWidget(row_idx, 0, checkbox_widget)
+            table.setCellWidget(row_idx, 0, checkbox_widget)
             name_item = QtWidgets.QTableWidgetItem(name)
-            self.addon_table.setItem(row_idx, 1, name_item)
+            table.setItem(row_idx, 1, name_item)
             desc_item = QtWidgets.QTableWidgetItem(desc)
-            self.addon_table.setItem(row_idx, 2, desc_item)
-        self.addon_table.resizeColumnToContents(0)
-        self.addon_table.setColumnWidth(0, min(self.addon_table.columnWidth(0), 32))
-        self.addon_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+            table.setItem(row_idx, 2, desc_item)
+        table.resizeColumnToContents(0)
+        table.setColumnWidth(0, min(table.columnWidth(0), 32))
+        table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+
+    def populate_addon_table(self):
+        addons_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main", "addons")
+        # Get allowed set for selected server
+        server = self.server_dropdown.currentText()
+        allowed = None
+        if server != "Show All":
+            allowed = {name.lower() for name in allowed_list.get(server, set())}
+        self.populate_table(
+            self.addon_table,
+            addons_dir,
+            allowed,
+            PRECHECKED_ADDONS,
+            extract_addon_description
+        )
 
     def populate_plugin_table(self):
-        # Clear table
-        self.plugin_table.setRowCount(0)
         plugins_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main", "plugins")
-        plugins_dir = os.path.abspath(plugins_dir)
-
         # Get allowed set for selected server
         server = self.server_dropdown.currentText()
         allowed = None
         if server != "Show All":
             allowed = {name.lower() for name in allowed_list.get(server, set())}
+        self.populate_table(
+            self.plugin_table,
+            plugins_dir,
+            allowed,
+            PRECHECKED_PLUGINS,
+            lambda name: PLUGIN_DESCRIPTIONS.get(name, "")
+        )
 
-        rows = []
-        if os.path.isdir(plugins_dir):
-            for fname in sorted(os.listdir(plugins_dir)):
-                if fname.lower().endswith(".dll"):
-                    plugin_name = os.path.splitext(fname)[0]
-                    if allowed is not None and plugin_name.lower() not in allowed:
-                        continue
-                    desc = PLUGIN_DESCRIPTIONS.get(plugin_name, "")
-                    rows.append((plugin_name, desc))
-        self.plugin_table.setRowCount(len(rows))
-        for row_idx, (name, desc) in enumerate(rows):
-            checkbox_widget = QtWidgets.QWidget()
-            checkbox = QtWidgets.QCheckBox()
-            if name.lower() in PRECHECKED_PLUGINS:
-                checkbox.setChecked(True)
-            checkbox_layout = QtWidgets.QHBoxLayout(checkbox_widget)
-            checkbox_layout.addStretch()
-            checkbox_layout.addWidget(checkbox)
-            checkbox_layout.addStretch()
-            checkbox_layout.setContentsMargins(0, 0, 0, 0)
-            self.plugin_table.setCellWidget(row_idx, 0, checkbox_widget)
-            name_item = QtWidgets.QTableWidgetItem(name)
-            self.plugin_table.setItem(row_idx, 1, name_item)
-            desc_item = QtWidgets.QTableWidgetItem(desc)
-            self.plugin_table.setItem(row_idx, 2, desc_item)
-        self.plugin_table.resizeColumnToContents(0)
-        self.plugin_table.setColumnWidth(0, min(self.plugin_table.columnWidth(0), 32))
-        self.plugin_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+    def save_selection_to_file(self):
+        # Get Ashita root
+        ashita_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main"))
+        scripts_dir = os.path.join(ashita_root, "scripts")
+        os.makedirs(scripts_dir, exist_ok=True)
+        out_path = os.path.join(scripts_dir, "addons_plugins.txt")
+    
+        # Gather checked plugins
+        plugin_names = []
+        if hasattr(self, "plugin_table"):
+            for row in range(self.plugin_table.rowCount()):
+                widget = self.plugin_table.cellWidget(row, 0)
+                if widget:
+                    checkbox = widget.findChild(QtWidgets.QCheckBox)
+                    if checkbox and checkbox.isChecked():
+                        name_item = self.plugin_table.item(row, 1)
+                        if name_item:
+                            plugin_names.append(name_item.text())
+    
+        # Gather checked addons
+        addon_names = []
+        if hasattr(self, "addon_table"):
+            for row in range(self.addon_table.rowCount()):
+                widget = self.addon_table.cellWidget(row, 0)
+                if widget:
+                    checkbox = widget.findChild(QtWidgets.QCheckBox)
+                    if checkbox and checkbox.isChecked():
+                        name_item = self.addon_table.item(row, 1)
+                        if name_item:
+                            addon_names.append(name_item.text())
+        # Gather keybind commands
+        keybind_commands = []
+        if hasattr(self, "keybinds_table"):
+            for row in range(self.keybinds_table.rowCount()):
+                btn = self.keybinds_table.cellWidget(row, 0)
+                cmd_edit = self.keybinds_table.cellWidget(row, 1)
+                if btn and cmd_edit:
+                    key_text = btn.text()
+                    command = cmd_edit.text().strip()
+                    if key_text and command:
+                        ashita_key = qt_keyseq_to_ashita(key_text)
+                        keybind_commands.append(f"{ashita_key} {command}")
+    
+        # Write to file
+        with open(out_path, "w", encoding="utf-8") as f:
+            for plugin in plugin_names:
+                f.write(f"/load {plugin}\n")
+            f.write("\n")
+            for addon in addon_names:
+                f.write(f"/addon load {addon}\n")
+            for keybind in keybind_commands:
+                f.write(f"/bind {keybind}\n")
+        print(f"[DEBUG] Saved selection to {out_path}")
+       
