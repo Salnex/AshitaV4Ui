@@ -28,19 +28,21 @@ class MainWindow(QtWidgets.QWidget):
         # Use the layout class
         self.ui = MainWindowLayout(self)
         self.setLayout(self.ui.layout)
+        self.setFixedSize(self.sizeHint())
 
         # Assign Widgets from the layout
         self.profile_launch_button = self.ui.profile_launch_button
         self.profile_dropdown = self.ui.profile_dropdown
         self.refresh_profiles()
-        self.create_ini_button = self.ui.create_ini_button
-        self.download_button = self.ui.download_button
+        # Remove: self.create_ini_button = self.ui.create_ini_button
+        # Remove: self.download_button = self.ui.download_button
 
-        # Make sure the buttons are connected to their respective methods
+        # Connect menu actions
+        self.ui.create_ini_action.triggered.connect(self.create_new_ini)
+        self.ui.download_ashita_action.triggered.connect(self.start_download)
+        # Connect buttons
         self.profile_launch_button.clicked.connect(self.launch_ashita)
-        self.create_ini_button.clicked.connect(self.create_new_ini)
         self.ui.manage_addons_button.clicked.connect(self.open_addon_plugin_manager)
-        self.download_button.clicked.connect(self.start_download)
         #self.show_ini_button.clicked.connect(self.show_ini_popup)
         
 
@@ -138,4 +140,4 @@ class MainWindow(QtWidgets.QWidget):
 
     def accept(self):
         self.save_selection_to_file()
-        super().accept()       
+        super().accept()
