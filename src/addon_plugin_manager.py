@@ -5,6 +5,7 @@ from qtpy import QtWidgets, QtGui
 from qtpy.QtCore import Qt
 from plugin_descriptions import PLUGIN_DESCRIPTIONS
 from allowed_lists import allowed_list
+from config import ASHITA_ROOT, PROJECT_ROOT, ASHITA_ADDONS_DIR, ASHITA_PLUGINS_DIR, ASHITA_SCRIPTS_DIR, ASHITA_BOOT_CONFIG_DIR
 
 PRECHECKED_ADDONS = {"distance", "fps", "move", "timestamp", "tparty"}
 PRECHECKED_PLUGINS = {"thirdparty", "addons", "screenshot","tparty"}
@@ -73,7 +74,7 @@ class KeybindButton(QtWidgets.QPushButton):
 class AddonPluginManagerWindow(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Addon & Plugin Manager")
+        self.setWindowTitle("Addons, Plugins, and Keybinds Manager")
         self.resize(600, 400)
         self.setup_ui()
 
@@ -245,7 +246,6 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
         table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
 
     def populate_addon_table(self):
-        addons_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main", "addons")
         # Get allowed set for selected server
         server = self.server_dropdown.currentText()
         allowed = None
@@ -253,14 +253,13 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
             allowed = {name.lower() for name in allowed_list.get(server, set())}
         self.populate_table(
             self.addon_table,
-            addons_dir,
+            ASHITA_ADDONS_DIR,
             allowed,
             PRECHECKED_ADDONS,
             extract_addon_description
         )
 
     def populate_plugin_table(self):
-        plugins_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main", "plugins")
         # Get allowed set for selected server
         server = self.server_dropdown.currentText()
         allowed = None
@@ -268,7 +267,7 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
             allowed = {name.lower() for name in allowed_list.get(server, set())}
         self.populate_table(
             self.plugin_table,
-            plugins_dir,
+            ASHITA_PLUGINS_DIR,
             allowed,
             PRECHECKED_PLUGINS,
             lambda name: PLUGIN_DESCRIPTIONS.get(name, "")
@@ -276,10 +275,8 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
 
     def save_selection_to_file(self):
         # Get Ashita root
-        ashita_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Ashita-v4beta-main"))
-        scripts_dir = os.path.join(ashita_root, "scripts")
-        os.makedirs(scripts_dir, exist_ok=True)
-        out_path = os.path.join(scripts_dir, "addons_plugins.txt")
+        os.makedirs(ASHITA_SCRIPTS_DIR, exist_ok=True)
+        out_path = os.path.join(ASHITA_SCRIPTS_DIR, "addons_plugins.txt")
     
         # Gather checked plugins
         plugin_names = []
