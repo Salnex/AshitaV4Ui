@@ -1,7 +1,7 @@
 import os
 import sys
 import zipfile
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
 from main_window_layout import MainWindowLayout
 from download_thread import DownloadThread
 from ini_editor_dialog import IniEditorDialog
@@ -40,6 +40,7 @@ class MainWindow(QtWidgets.QWidget):
         # Connect menu actions
         self.ui.create_ini_action.triggered.connect(self.create_new_ini)
         self.ui.download_ashita_action.triggered.connect(self.start_download)
+        self.ui.about_action.triggered.connect(self.open_github_page)
         # Connect buttons
         self.profile_launch_button.clicked.connect(self.launch_ashita)
         self.ui.manage_addons_button.clicked.connect(self.open_addon_plugin_manager)
@@ -137,6 +138,9 @@ class MainWindow(QtWidgets.QWidget):
     def open_addon_plugin_manager(self):
         dlg = AddonPluginManagerWindow(self)
         dlg.exec_()
+
+    def open_github_page(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://github.com/Salnex/AshitaV4Ui"))    
 
     def accept(self):
         self.save_selection_to_file()

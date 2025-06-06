@@ -4,11 +4,15 @@ class MainWindowLayout:
     def __init__(self, parent=None):
         # Menu bar
         self.menu_bar = QtWidgets.QMenuBar(parent)
+        #Tools
         self.tools_menu = self.menu_bar.addMenu("Tools")
         self.create_ini_action = QtWidgets.QAction("Create Profile", parent)
         self.download_ashita_action = QtWidgets.QAction("Download Ashita v4", parent)
         self.tools_menu.addAction(self.create_ini_action)
         self.tools_menu.addAction(self.download_ashita_action)
+        #About
+        self.about_action = QtWidgets.QAction("About", parent)
+        self.menu_bar.addAction(self.about_action)        
 
         # Not Menu bar
         self.profile_launch_button = QtWidgets.QPushButton("Launch Ashita with Profile")
