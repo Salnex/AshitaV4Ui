@@ -1,3 +1,4 @@
 qtpy
 PyQt6
 requests
+pygame

@@ -3,6 +3,7 @@ import configparser
 from qtpy import QtWidgets
 from ini_data import ini_structure, tooltips, friendly_names, padmode000_options, padsin000_options, ui_metadata
 from config import PROFILE_NAME_DEFAULT
+from GamepadButtonMapButton import GamepadButtonMapButton
 
 class NewIniDialog(QtWidgets.QDialog):
     def __init__(self, ini_dir, parent=None):
@@ -70,27 +71,20 @@ class NewIniDialog(QtWidgets.QDialog):
                 elif widget_type == "padsin_group":
                     groupbox = QtWidgets.QGroupBox(label_text)
                     vbox = QtWidgets.QVBoxLayout(groupbox)
-                    spinboxes = []
+                    buttons = []
                     default_values = [x.strip() for x in default.split(",")] if default else ["0"] * 27
                     for i, (desc, tip) in enumerate(padsin000_options):
                         hbox = QtWidgets.QHBoxLayout()
                         label = QtWidgets.QLabel(f"{i}: {desc}")
                         label.setToolTip(tip)
-                        spin = QtWidgets.QSpinBox()
-                        spin.setMinimum(0)
-                        spin.setMaximum(255)
-                        spin.setToolTip(tip)
-                        if i < len(default_values):
-                            try:
-                                spin.setValue(int(default_values[i]))
-                            except ValueError:
-                                spin.setValue(0)
+                        btn = GamepadButtonMapButton(i, default_values[i] if i < len(default_values) else "0")
+                        btn.setToolTip(tip)
                         hbox.addWidget(label)
-                        hbox.addWidget(spin)
+                        hbox.addWidget(btn)
                         vbox.addLayout(hbox)
-                        spinboxes.append(spin)
+                        buttons.append(btn)
                     groupbox.setToolTip(tooltip)
-                    tab_inputs[tab_name][section][key] = spinboxes
+                    tab_inputs[tab_name][section][key] = buttons
                     tab_layout.addRow(groupbox)
                 elif widget_type == "checkbox":
                     checkbox = QtWidgets.QCheckBox()
@@ -155,6 +149,35 @@ class NewIniDialog(QtWidgets.QDialog):
         self.setLayout(layout)
 
     def save_ini(self):
+        XINPUT_BUTTON_MAP = {
+            "B": 0,
+            "X": 1,
+            "Y": 2,
+            "A": 3,
+            "DPad Right": 4,
+            "DPad Left": 5,
+            "DPad Up": 6,
+            "DPad Down": 7,
+            "LB": 8,
+            "LT (Left Trigger)": 9,
+            "LStick": 10,
+            "RB": 11,
+            "RT (Right Trigger)": 12,
+            "RStick": 13,
+            "Start": 14,
+            "Back": 15,
+            "None": 16,
+            "-1": 16,
+            "Left Stick Right": 32,
+            "Left Stick Left": 32,
+            "Left Stick Up": 33,
+            "Left Stick Down": 33,
+            "Right Stick Right": 35,
+            "Right Stick Left": 35,
+            "Right Stick Up": 36,
+            "Right Stick Down": 36,
+        }
+
         filename = self.filename_edit.text().strip()
         if not filename:
             QtWidgets.QMessageBox.warning(self, "Error", "Filename cannot be empty.")
@@ -168,10 +191,15 @@ class NewIniDialog(QtWidgets.QDialog):
 
         config = configparser.ConfigParser()
 
+        # Detect XInput enabled once, outside the per-key loop
+        padmode_widgets = self.inputs.get("padmode000", {}).get("padmode000")
+        xinput_enabled = False
+        if padmode_widgets and isinstance(padmode_widgets, list) and len(padmode_widgets) > 0:
+            xinput_enabled = padmode_widgets[0].isChecked()
+
         for section, keys in self.ini_structure.items():
             config[section] = {}
             for key, default in keys.items():
-                # Skip hidden keys for now, add them after
                 meta = ui_metadata.get(section, {}).get(key, {"widget": "lineedit", "show": True, "tab": section})
                 if not meta.get("show", True):
                     continue
@@ -186,8 +214,18 @@ class NewIniDialog(QtWidgets.QDialog):
                     values = ["1" if cb.isChecked() else "0" for cb in widget]
                     config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
                 elif widget_type == "padsin_group":
-                    values = [str(spin.value()) for spin in widget]
-                    config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
+                    if xinput_enabled:
+                        # Map button names to XInput values
+                        values = []
+                        for btn in widget:
+                            btn_name = btn.text()
+                            mapped_val = XINPUT_BUTTON_MAP.get(btn_name, -1)
+                            values.append(str(mapped_val))
+                        config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
+                    else:
+                        # Fallback: just use the button text or value
+                        values = [btn.text() for btn in widget]
+                        config[section][key] = "-1" if all(v == "0" for v in values) else ",".join(values)
                 elif widget_type == "checkbox":
                     config[section][key] = "1" if widget.isChecked() else "0"
                 elif widget_type == "combobox":

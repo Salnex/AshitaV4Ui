@@ -116,8 +116,8 @@ ini_structure = {
         "0043": "1",
         "0044": "1",
         "0045": "0",
-        "padmode000": "-1",
-        "padsin000": "-1",
+        "padmode000": "1,1,0,0,1,1",
+        "padsin000": "LB,LT (Left Trigger),RStick,RT (Right Trigger),LStick,B,X,A,Y,Back,None,None,Start,Left Stick Up,Left Stick Down,Left Stick Left,Left Stick Right,Right Stick Up,Right Stick Down,Right Stick Left,Right Stick Right,DPad Up,DPad Down,DPad Left,DPad Right,RB,None",
         "padguid000": "-1"
     }
 }
