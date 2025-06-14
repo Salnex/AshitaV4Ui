@@ -23,24 +23,31 @@ AshitaV4Ui
 1. Clone the repository:
    ```
    git clone https://git.salsinc.net/salnex/AshitaV4Ui/src/branch/main
+   or
+   Download it as a zip
    ```
 2. Navigate to the project directory:
    ```
    cd AshitaV4Ui
    ```
-3. Install the required dependencies:  
+3. Install the required dependencies:
+   Python
    qtpy  
    PyQt6  
    requests
+   pygame
 
 ## Usage
 
 To run the application, execute the `Main.py` file. The application will provide a graphical interface for managing INI files.
 
 ## Screenshots
-![Main Window](CreateINIWindowAshitaTab.png)
-![INI Editor Ashita](CreateINIWindowAshitaTab.png)
-![INI Editor D3D](CreateINIWindowFFXIRegistryTab.png)
-![INI Editor Registry](CreateINIWindowFFXIRegistryTab.png)
-![INI Editor Gamepad](CreateINIWindowGamepadTab.png)
+![Main Window](Sceenshots/MainWindowNew.png)
+![INI Editor Ashita](Sceenshots/CreateINIWindowAshitaTab.png)
+![INI Editor D3D](Sceenshots/CreateINIWindowFFXIRegistryTab.png)
+![INI Editor Registry](Sceenshots/CreateINIWindowFFXIRegistryTab.png)
+![INI Editor Gamepad](Sceenshots/CreateINIWindowGamepadTab.png)
+![Addons Editor](Sceenshots/Addons.png)
+![Plugins Editor](Sceenshots/Plugins.png)
+![Keybinds Editor](Sceenshots/Keybinds.png)
 
