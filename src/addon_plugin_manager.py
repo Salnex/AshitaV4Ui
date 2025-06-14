@@ -6,6 +6,7 @@ from qtpy.QtCore import Qt
 from plugin_descriptions import PLUGIN_DESCRIPTIONS
 from allowed_lists import allowed_list
 from config import ASHITA_ROOT, PROJECT_ROOT, ASHITA_ADDONS_DIR, ASHITA_PLUGINS_DIR, ASHITA_SCRIPTS_DIR, ASHITA_BOOT_CONFIG_DIR
+from download_manager import DownloadManagerWindow
 
 PRECHECKED_ADDONS = {"distance", "fps", "move", "timestamp", "tparty"}
 PRECHECKED_PLUGINS = {"thirdparty", "addons", "screenshot","tparty"}
@@ -85,17 +86,22 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
     def setup_ui(self):
         layout = QtWidgets.QVBoxLayout(self)
 
-        # Server selection dropdown (inline with label)
+        # Server selection dropdown and download button (inline with label)
         filter_layout = QtWidgets.QHBoxLayout()
         filter_layout.addWidget(QtWidgets.QLabel("Server Filter:"))
         self.server_dropdown = QtWidgets.QComboBox()
         self.server_dropdown.addItem("Show All")
         self.server_dropdown.addItems(sorted(allowed_list.keys()))
         self.server_dropdown.currentIndexChanged.connect(self.refresh_tables)
+        download_btn = QtWidgets.QPushButton("Download Addons/Plugins")
+        download_btn.clicked.connect(self.open_download_manager)       
         filter_layout.addWidget(self.server_dropdown)
         filter_layout.addStretch()
+        filter_layout.addWidget(download_btn)
         layout.addLayout(filter_layout)
+        # Download button
 
+        
         # Tabs for Addons and Plugins
         self.tabs = QtWidgets.QTabWidget()
         self.addons_tab = QtWidgets.QWidget()
@@ -324,4 +330,7 @@ class AddonPluginManagerWindow(QtWidgets.QDialog):
             for keybind in keybind_commands:
                 f.write(f"/bind {keybind}\n")
         print(f"[DEBUG] Saved selection to {out_path}")
-       
+    def open_download_manager(self):
+        # Import here to avoid circular import if needed
+        dlg = DownloadManagerWindow(self)
+        dlg.exec_()

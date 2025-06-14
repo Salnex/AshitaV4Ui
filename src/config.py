@@ -15,6 +15,7 @@ def default_ashita_root():
 ASHITA_ROOT = default_ashita_root()
 
 ASHITA_DOWNLOAD_URL = "https://github.com/AshitaXI/Ashita-v4beta/archive/refs/heads/main.zip"
+ASHITA_DOWNLOADS_DIR = os.path.join(PROJECT_ROOT, "downloads")
 
 ASHITA_ADDONS_DIR = os.path.join(ASHITA_ROOT, "addons")
 ASHITA_PLUGINS_DIR = os.path.join(ASHITA_ROOT, "plugins")
@@ -26,3 +27,5 @@ ASHITA_BOOT_CONFIG_DIR = os.path.join(ASHITA_CONFIG_DIR, "boot")
 ASHITA_ADDON_CONFIG_DIR = os.path.join(ASHITA_CONFIG_DIR, "addons")
 
 PROFILE_NAME_DEFAULT = "MyProfile.ini"
+
+REPOS_DIR = os.path.join(os.path.dirname(__file__), "repos")
