@@ -16,7 +16,9 @@ AshitaV4Ui
 - **Ashita Launching and downloading**: Launch existing profiles or those created with this tool
 - **INI File Creation**: Users can create new INI files with predefined structures and default values.
 - **Tooltips**: Each INI key has an associated tooltip that provides detailed information about its purpose and valid values.
-- **
+- **Gamepad Mapping**: Users can to map gamepads via a ui.
+- **Addons & Plugins**: Users can select what addons they run including support for filtering via servers allowed addons
+- **Ashita Keybinds**: Bind keys in ashita via an interface
 
 
 ## Installation
