@@ -14,9 +14,10 @@ AshitaV4Ui
 
 ## Features
 - **Ashita Launching and downloading**: Launch existing profiles or those created with this tool
-- **INI File Editing**: Users can open, edit, and save INI files with a simple text editor interface.
 - **INI File Creation**: Users can create new INI files with predefined structures and default values.
 - **Tooltips**: Each INI key has an associated tooltip that provides detailed information about its purpose and valid values.
+- **
+
 
 ## Installation
 
@@ -42,12 +43,15 @@ AshitaV4Ui
 To run the application, execute the `Main.py` file. The application will provide a graphical interface for managing INI files.
 
 ## Screenshots
-![Main Window](Sceenshots/MainWindowNew.png)
-![INI Editor Ashita](Sceenshots/CreateINIWindowAshitaTab.png)
-![INI Editor D3D](Sceenshots/CreateINIWindowFFXIRegistryTab.png)
-![INI Editor Registry](Sceenshots/CreateINIWindowFFXIRegistryTab.png)
-![INI Editor Gamepad](Sceenshots/CreateINIWindowGamepadTab.png)
-![Addons Editor](Sceenshots/Addons.png)
-![Plugins Editor](Sceenshots/Plugins.png)
-![Keybinds Editor](Sceenshots/Keybinds.png)
+**Main Window**
+[<img src="Screenshots/MainWindowNew.png" alt="Main Window" width="200"/>](Screenshots/MainWindowNew.png)
+**INI Creation**
+[<img src="Screenshots/CreateINIWindowAshitaTab.png" alt="INI Editor Ashita" width="200"/>](Screenshots/CreateINIWindowAshitaTab.png)
+[<img src="Screenshots/CreateINIWindowFFXIRegistryTab.png" alt="INI Editor D3D" width="200"/>](Screenshots/CreateINIWindowFFXIRegistryTab.png)
+[<img src="Screenshots/CreateINIWindowFFXIRegistryTab.png" alt="INI Editor Registry" width="200"/>](Screenshots/CreateINIWindowFFXIRegistryTab.png)
+[<img src="Screenshots/CreateINIWindowGamepadTab.png" alt="INI Editor Gamepad" width="200"/>](Screnshots/CreateINIWindowGamepadTab.png)
+**Addons and Keybinds**
+[<img src="Screenshots/Addons.png" alt="Addons Editor" width="200"/>](Screenshots/Addons.png)
+[<img src="Screenshots/Plugins.png" alt="Plugins Editor" width="200"/>](Screenshots/Plugins.png)
+[<img src="Screenshots/Keybinds.png" alt="Keybinds Editor" width="200"/>](Screenshots/Keybinds.png)
 
